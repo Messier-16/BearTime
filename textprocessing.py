@@ -1,15 +1,17 @@
 class Class():
     classes = []
-    def __init__(self, name, place, day, tstart, tend):
-        self.name = name
-        self.place = place
-        self.day = day
-        self.tstart = tstart
-        self.tend = tend
+    def __init__(self, desc, days, times):
+        self.desc = desc
+        self.days = days
+        self.times = times
         Class.classes.append(self)
 
-
-inp = '''
+inp = '''AFRICAM 27AC	Discussion -DIS	
+W 4:00P-4:59P
+AFRICAM 27AC	Lecture -LEC	
+TuTh 2:00P-3:29P
+3.0'''
+inpfull = '''
 AFRICAM 27AC	Discussion -DIS	
 W 4:00P-4:59P
 AFRICAM 27AC	Lecture -LEC	
@@ -33,24 +35,35 @@ COMPSCI 70	Lecture -LEC
 TuTh 3:30P-4:59P
 4.0
 '''
+def check_int(s):
+    try:
+        int(s)
+        return True
+    except:
+        return False
 
-def Spacer(lines):
+def spacer(lines):
     ret = ''
-    for l in lines:
-        if l == 'A' or l == 'P':
-            yield ret
-            ret = ''
+    for i in range(len(lines)):
+        l = lines[i]
+        try:
+            l1, l2 = lines[i-4], lines[i-1]
+        except IndexError:
+            l1, l2 = '', ''
+        if l == '\n' and (l1 == ':' or l2 == 'A'):
+            ret += '\n'
         elif l == '\n':
             ret += ' '
         else:
             ret += l
+    return ret
 
-def Tokenizer(line):
-    line = line.split()
-    line[0] += line[1]
-    line.pop(1)
-    line.pop(1)
-    return line
+def cleaner(inp):
+    removals = ['1.0', '2.0', '3.0', '4.0', '5.0', 'Discussion', 'Lecture', 'Laboratory']
+    for s in removals:
+        if s in inp:
+            inp = inp.replace(s, '')
+    return inp
 
-
+print(spacer(cleaner(inpfull)))
 
