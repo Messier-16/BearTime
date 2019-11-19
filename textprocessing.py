@@ -1,11 +1,7 @@
-class Class():
-    classes = []
-    def __init__(self, desc, days, times):
-        self.desc = desc
-        self.days = days
-        self.times = times
-        Class.classes.append(self)
-
+import re
+days_list = ['M', 'W', 'Tu', 'Th', 'F', 'TBA']
+desctypes = ['-DIS', '-LEC', '-LAB']
+removals = ['1.0', '2.0', '3.0', '4.0', '5.0', 'Discussion', 'Lecture', 'Laboratory','\t']
 inp = '''AFRICAM 27AC	Discussion -DIS	
 W 4:00P-4:59P
 AFRICAM 27AC	Lecture -LEC	
@@ -35,35 +31,55 @@ COMPSCI 70	Lecture -LEC
 TuTh 3:30P-4:59P
 4.0
 '''
-def check_int(s):
-    try:
-        int(s)
-        return True
-    except:
-        return False
 
-def spacer(lines):
-    ret = ''
-    for i in range(len(lines)):
-        l = lines[i]
-        try:
-            l1, l2 = lines[i-4], lines[i-1]
-        except IndexError:
-            l1, l2 = '', ''
-        if l == '\n' and (l1 == ':' or l2 == 'A'):
-            ret += '\n'
-        elif l == '\n':
-            ret += ' '
-        else:
-            ret += l
-    return ret
+class Class():
+    classes = []
+    def __init__(self, desc, days, times):
+        self.desc = desc
+        self.days = [day for day in days_list if day in days]
+        self.tstart = times[:5]
+        self.tend = times[6:]
+        Class.classes.append(self)
 
 def cleaner(inp):
-    removals = ['1.0', '2.0', '3.0', '4.0', '5.0', 'Discussion', 'Lecture', 'Laboratory']
     for s in removals:
         if s in inp:
             inp = inp.replace(s, '')
     return inp
 
-print(spacer(cleaner(inpfull)))
+def classifier(s):
+    for t in desctypes:
+        if t in s:
+            return 'desc'
+    try: l = s.split()[0]
+    except: l=''
+    for day in days_list:
+        if day in l:
+            l = l.replace(day, '')
+    return 'time' if not len(l) else 'unknown'
 
+def main(s):
+    split_input = re.split('\n',cleaner(inpfull))
+    while True:
+        try: split_input.remove('')
+        except: break
+
+    for i in range(len(split_input)):
+        currtoken = split_input[i]
+        try: nexttoken = split_input[i+1]
+        except: nexttoken = ''
+        currclass = classifier(currtoken)
+        nextclass = classifier(nexttoken)
+        if currclass == 'desc' and nextclass == 'time':
+            split_nexttoken = nexttoken.split()
+            try: temp = Class(currtoken, split_nexttoken[0], split_nexttoken[1])
+            except: temp = Class(currtoken, split_nexttoken[0], split_nexttoken[0])
+
+    return [[self.desc,self.days,self.tstart,self.tend] for self in Class.classes]
+
+print(main(inpfull))
+
+# main() returns a list of lists, each of which has three elements representing a class
+# (description, days, and time). These can also be accessed through Class.classes, which
+# contains the class instances, which can then be used to access class properties
+# (description, days, and time).
