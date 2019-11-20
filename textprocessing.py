@@ -31,14 +31,40 @@ COMPSCI 70	Lecture -LEC
 TuTh 3:30P-4:59P
 4.0
 '''
+inpramesh = ''' COMLIT 60AC	Discussion -DIS	
+F 12:00P-12:59P
+COMLIT 60AC	Lecture -LEC	
+MWF 10:00A-10:59A
+4.0
+COMPSCI 61A	Discussion -DIS	
+TBA
+COMPSCI 61A	Laboratory -LAB	
+COMPSCI 61A	Lecture -LEC	
+MW 2:00P-2:59P
+F 2:00P-2:59P
+4.0
+ELENG 16A	Laboratory -LAB	
+Th 5:00P-7:59P
+ELENG 16A	Discussion -DIS	
+TBA
+ELENG 16A	Lecture -LEC	
+TuTh 12:30P-1:59P
+4.0
+RHETOR R1A	Lecture -LEC	
+MWF 4:00P-4:59P
+4.0'''
 
 class Class():
     classes = []
     def __init__(self, desc, days, times):
         self.desc = desc
         self.days = [day for day in days_list if day in days]
-        self.tstart = times[:5]
-        self.tend = times[6:]
+        if len(times)<12:
+            self.tstart = times[:5]
+            self.tend = times[6:]
+        else:
+            self.tstart = times[:6]
+            self.tend = times[7:]
         Class.classes.append(self)
 
 def cleaner(inp):
@@ -59,7 +85,7 @@ def classifier(s):
     return 'time' if not len(l) else 'unknown'
 
 def main(s):
-    split_input = re.split('\n',cleaner(inpfull))
+    split_input = re.split('\n',cleaner(s))
     while True:
         try: split_input.remove('')
         except: break
@@ -77,7 +103,7 @@ def main(s):
 
     return [[self.desc,self.days,self.tstart,self.tend] for self in Class.classes]
 
-print(main(inpfull))
+print(main(inpramesh))
 
 # main() returns a list of lists, each of which has three elements representing a class
 # (description, days, and time). These can also be accessed through Class.classes, which
